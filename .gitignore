@@ -1,0 +1,11 @@
+# Model weights: downloaded by scripts/fetch-model.sh, never committed (1 GB).
+app/Resources/Qwen3-1.7B-4bit/
+
+# Xcode / SPM
+app/.build/
+build/
+DerivedData/
+xcuserdata/
+*.xcuserstate
+.DS_Store
+.swiftpm/
