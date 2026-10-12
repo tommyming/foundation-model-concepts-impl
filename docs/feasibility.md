@@ -2,6 +2,8 @@
 
 Date: 2026-10-09.
 
+Accepted design decisions that extend this research live in `docs/decisions.md`.
+
 This note records the Phase 0 probe for the iOSConf SG 2027 demo. It is a research record. It is not product code.
 
 Evidence lives in:
