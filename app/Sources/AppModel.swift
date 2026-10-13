@@ -28,10 +28,13 @@ final class AppModel: ObservableObject {
     @Published var loadDuration: Duration?
     @Published var firstTokenLatency: Duration?
     @Published var totalLatency: Duration?
+    @Published var adapterActive = false
+    @Published var adapterSwitchDuration: Duration?
 
     private var container: ModelContainer?
     private var session: ChatSession?
     private var task: Task<Void, Never>?
+    private var adapter: LoRAContainer?
 
     var isBusy: Bool { state == .loading || state == .running }
 
@@ -102,6 +105,65 @@ final class AppModel: ObservableObject {
 
     func cancel() {
         task?.cancel()
+    }
+
+    // MARK: - Adapter hot-swap (Phase 2)
+
+    /// Applies or removes the classify adapter on the live model.
+    /// Unload-before-load and a fresh ChatSession (new KV cache) after every swap.
+    func toggleAdapter() async {
+        guard let container else { return }
+        guard let adaptersRoot = Bundle.main.url(forResource: "adapters", withExtension: nil) else {
+            fail("adapters/ missing from bundle.")
+            return
+        }
+
+        let applying = !adapterActive
+        if applying, adapter == nil {
+            do {
+                adapter = try LoRAContainer.from(
+                    directory: adaptersRoot.appending(component: "classify"))
+                log.info("Adapter classify parsed: \(self.adapter!.configuration.numLayers) layers")
+            } catch {
+                fail("Adapter parse failed: \(error.localizedDescription)")
+                return
+            }
+        }
+        guard let adapter else { return }
+
+        let clock = ContinuousClock()
+        let start = clock.now
+        final class ErrorBox { var error: Error? }
+        let box = ErrorBox()
+        await container.update { context in
+            do {
+                if applying {
+                    try adapter.load(into: context.model)
+                } else {
+                    adapter.unload(from: context.model)
+                }
+            } catch {
+                box.error = error
+            }
+        }
+        if let error = box.error {
+            fail("Adapter switch failed: \(error.localizedDescription)")
+            return
+        }
+        let elapsed = clock.now - start
+        adapterSwitchDuration = elapsed
+        adapterActive = applying
+        rebuildSession()
+        log.info("Adapter \(applying ? "classify active" : "none active", privacy: .public): switch \(secondsString(elapsed), privacy: .public) s")
+    }
+
+    /// Fresh session so the KV cache never spans an adapter boundary.
+    private func rebuildSession() {
+        guard let container else { return }
+        session = ChatSession(
+            container,
+            instructions: instructions,
+            generateParameters: GenerateParameters(temperature: 0))
     }
 
     private func fail(_ message: String) {

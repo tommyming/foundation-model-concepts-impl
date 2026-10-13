@@ -1,0 +1,16 @@
+# Phase 2 adapter: classify. QLoRA against the exact 4-bit repo we ship.
+# Train: mlx_lm.lora --config classify.yaml   (run from training/, venv active)
+model: "mlx-community/Qwen3-1.7B-4bit"
+train: true
+data: "./data/classify"
+adapter_path: "./adapters/classify"
+fine_tune_type: lora
+num_layers: 16          # last 16 of 28 blocks; keys omitted = all linear layers (Swift default parity)
+iters: 600
+batch_size: 4
+learning_rate: 1e-5
+mask_prompt: true       # loss on the label only
+lora_parameters:
+  rank: 8
+  scale: 20.0
+  dropout: 0.0

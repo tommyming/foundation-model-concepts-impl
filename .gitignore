@@ -1,6 +1,11 @@
 # Model weights: downloaded by scripts/fetch-model.sh, never committed (1 GB).
 app/Resources/Qwen3-1.7B-4bit/
 
+# Training: venv, generated data, raw adapter output (shipped copy lives in app/Resources/adapters/).
+training/.venv/
+training/data/
+training/adapters/
+
 # Xcode / SPM
 app/.build/
 build/

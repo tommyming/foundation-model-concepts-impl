@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1AB554AAAA2743D11EFABCA2 /* Qwen3-1.7B-4bit in Resources */ = {isa = PBXBuildFile; fileRef = F45D02DF8F67AEB5A5659711 /* Qwen3-1.7B-4bit */; };
+		5070FA6F116132F4B7DC41F8 /* adapters in Resources */ = {isa = PBXBuildFile; fileRef = AB694E117E3DCFEE29D49A54 /* adapters */; };
 		5F958D4271B9D2B0EF592F20 /* TokenizerLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A414655C04002AB906020F1F /* TokenizerLoader.swift */; };
 		7FF857BF9F0FB3C33F325F58 /* Tokenizers in Frameworks */ = {isa = PBXBuildFile; productRef = D562CF0FD6AC3F759543FE21 /* Tokenizers */; };
 		8D90D6214D797082EC2BA09D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7050079C63F0172DC25C2D70 /* ContentView.swift */; };
@@ -20,8 +20,8 @@
 		09BBC5E10F199361B7D99DEE /* AIMemoryLab.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AIMemoryLab.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7050079C63F0172DC25C2D70 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A414655C04002AB906020F1F /* TokenizerLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenizerLoader.swift; sourceTree = "<group>"; };
+		AB694E117E3DCFEE29D49A54 /* adapters */ = {isa = PBXFileReference; lastKnownFileType = folder; name = adapters; path = Resources/adapters; sourceTree = SOURCE_ROOT; };
 		D27BFF24CE097AE3BEA1A86D /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
-		F45D02DF8F67AEB5A5659711 /* Qwen3-1.7B-4bit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "Qwen3-1.7B-4bit"; path = "Resources/Qwen3-1.7B-4bit"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,7 +60,7 @@
 		4FF106C8B6BDD067325D8BCE /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				F45D02DF8F67AEB5A5659711 /* Qwen3-1.7B-4bit */,
+				AB694E117E3DCFEE29D49A54 /* adapters */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -137,7 +137,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1AB554AAAA2743D11EFABCA2 /* Qwen3-1.7B-4bit in Resources */,
+				5070FA6F116132F4B7DC41F8 /* adapters in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

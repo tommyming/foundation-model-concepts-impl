@@ -32,6 +32,15 @@ struct ContentView: View {
                     }
                 }
 
+                Section("Adapter") {
+                    Toggle("Classify adapter", isOn: Binding(
+                        get: { model.adapterActive },
+                        set: { _ in Task { await model.toggleAdapter() } }))
+                        .disabled(model.state != .ready)
+                    LabeledContent("Last switch",
+                        value: model.adapterSwitchDuration.map(format) ?? "—")
+                }
+
                 Section("Last run") {
                     LabeledContent("Time to first token",
                         value: model.firstTokenLatency.map(format) ?? "—")

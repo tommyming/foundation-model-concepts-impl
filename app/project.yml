@@ -23,8 +23,8 @@ targets:
     platform: iOS
     sources:
       - path: Sources
-      # Blue folder reference: preserves the model directory layout in the bundle.
-      - path: Resources/Qwen3-1.7B-4bit
+      # Blue folder references: preserve model/adapter directory layouts in the bundle.
+      - path: Resources/adapters
         type: folder
         buildPhase: resources
     dependencies:
