@@ -1,0 +1,15 @@
+# Phase 3 adapter: extract. Same base, same hyperparameters as classify.yaml.
+model: "mlx-community/Qwen3-1.7B-4bit"
+train: true
+data: "./data/extract"
+adapter_path: "./adapters/extract"
+fine_tune_type: lora
+num_layers: 16
+iters: 600
+batch_size: 4
+learning_rate: 1e-5
+mask_prompt: true
+lora_parameters:
+  rank: 8
+  scale: 20.0
+  dropout: 0.0

@@ -1,57 +1,102 @@
-// Phase 1 UI: load button, prompt, generate, streamed output, timings.
+// Phase 3+ UI: mode picker, task buttons, adapter state, benchmarks, output.
 
 import SwiftUI
 
 struct ContentView: View {
     @StateObject private var model = AppModel()
     @State private var prompt =
-        "Summarize this note in two sentences: Sara wants the Q3 forecast slides before Friday. Ping Acme Corp about the renewal, and book the lab for the antenna test."
+        "Sara wants the Q3 forecast slides before Friday. Acme Corp asked about the renewal by end of month. The review session is at the Singapore lab. Check the shared folder for details."
+    @State private var benchIterations = 1
+    @State private var benchProgress: String?
+    @State private var benchURL: URL?
+    @State private var benchRunning = false
 
     var body: some View {
         NavigationStack {
             Form {
-                Section("Base model") {
+                Section("Runtime") {
+                    Picker("Mode", selection: $model.mode) {
+                        Text("Naive").tag(AppModel.Mode.naive)
+                        Text("Shared Base + Adapters").tag(AppModel.Mode.sharedBase)
+                    }
+                    .pickerStyle(.segmented)
+                    .disabled(model.isBusy)
+
                     HStack {
                         Text(model.state.rawValue.capitalized)
                         Spacer()
                         if let d = model.loadDuration {
-                            Text("loaded in \(format(d))")
+                            Text("loaded in \(format(d))").foregroundStyle(.secondary)
                         }
                     }
                     if model.state == .idle {
-                        Button("Load from bundle") { Task { await model.load() } }
+                        Button("Preload") { Task { await model.loadBase() } }
+                    }
+                    if model.state != .idle {
+                        Button("Unload / Reset", role: .destructive) { model.reset() }
+                            .disabled(model.isBusy)
+                    }
+                }
+
+                if model.mode == .sharedBase {
+                    Section("Active state") {
+                        LabeledContent("Base model", value: model.baseLoaded ? "Loaded" : "—")
+                        LabeledContent("Adapter", value: model.activeAdapter?.rawValue ?? "none")
+                        LabeledContent("Last switch",
+                            value: model.lastSwitch.map(format) ?? "—")
+                    }
+                } else {
+                    Section("Resident instances") {
+                        ForEach(AITask.allCases, id: \.self) { t in
+                            LabeledContent(t.rawValue.capitalized,
+                                value: model.residentInstances.contains(t) ? "resident" : "not loaded")
+                        }
                     }
                 }
 
                 Section("Input") {
                     TextEditor(text: $prompt).frame(minHeight: 100)
-                    Button("Generate") { model.generate(prompt: prompt) }
-                        .disabled(model.state != .ready)
+                    HStack {
+                        ForEach(AITask.allCases, id: \.self) { t in
+                            Button(t.rawValue.capitalized) { model.run(task: t, input: prompt) }
+                                .buttonStyle(.bordered)
+                                .disabled(model.state != .ready)
+                        }
+                    }
                     if model.state == .running {
                         Button("Cancel", role: .destructive) { model.cancel() }
                     }
                 }
 
-                Section("Adapter") {
-                    Toggle("Classify adapter", isOn: Binding(
-                        get: { model.adapterActive },
-                        set: { _ in Task { await model.toggleAdapter() } }))
-                        .disabled(model.state != .ready)
-                    LabeledContent("Last switch",
-                        value: model.adapterSwitchDuration.map(format) ?? "—")
-                }
-
                 Section("Last run") {
                     LabeledContent("Time to first token",
-                        value: model.firstTokenLatency.map(format) ?? "—")
-                    LabeledContent("Total", value: model.totalLatency.map(format) ?? "—")
+                        value: model.lastMetrics?.firstToken.map(format) ?? "—")
+                    LabeledContent("Total", value: model.lastMetrics.map { format($0.total) } ?? "—")
+                    LabeledContent("Footprint", value: model.lastMetrics.map {
+                        String(format: "%.0f MB", $0.memoryAfter.physicalFootprintMB)
+                    } ?? "—")
+                    LabeledContent("Peak footprint", value: model.lastMetrics.map {
+                        String(format: "%.0f MB", $0.memoryAfter.peakPhysicalFootprintMB)
+                    } ?? "—")
+                }
+
+                Section("Benchmarks") {
+                    Stepper("Measured iterations: \(benchIterations)", value: $benchIterations, in: 1...5)
+                        .disabled(benchRunning)
+                    Button("Run Scenarios") { runBenchmarks() }
+                        .disabled(model.state != .ready || benchRunning)
+                    if let p = benchProgress { Text(p).foregroundStyle(.secondary) }
+                    if let url = benchURL {
+                        ShareLink("Last result: \(url.lastPathComponent)", item: url)
+                    }
                 }
 
                 Section("Output") {
                     ScrollView {
                         Text(model.output).font(.body.monospaced())
                             .frame(maxWidth: .infinity, alignment: .leading)
-                    }.frame(minHeight: 180)
+                            .textSelection(.enabled)
+                    }.frame(minHeight: 160)
                 }
 
                 if let err = model.errorText {
@@ -59,6 +104,23 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("AI Memory Lab")
+        }
+    }
+
+    private func runBenchmarks() {
+        benchRunning = true
+        benchProgress = "starting"
+        Task {
+            do {
+                benchURL = try await Benchmark.runAll(
+                    model: model, input: prompt, measured: benchIterations) {
+                    benchProgress = $0
+                }
+                benchProgress = "done"
+            } catch {
+                benchProgress = "failed: \(error.localizedDescription)"
+            }
+            benchRunning = false
         }
     }
 

@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""Generates the synthetic classification dataset for the Phase 2 adapter.
+"""Generates the synthetic datasets for the three demo adapters.
 
-Seeded and deterministic: same script, same data. Emits train.jsonl and
-valid.jsonl (chat format) under training/data/classify/.
+Seeded and deterministic. Emits train.jsonl / valid.jsonl (chat format) under
+training/data/<task>/ for task in classify, summarize, extract.
+
+All three tasks share the same underlying "facts", rendered differently:
+classify -> one label; summarize -> one compressed sentence; extract -> strict
+JSON. This mirrors the demo story: same input world, three capabilities.
 """
 
 import json
@@ -13,10 +17,21 @@ random.seed(20261013)
 
 LABELS = ["Technology", "Business", "Science", "Culture", "Other"]
 
-SYSTEM = (
-    "You classify notes. Answer with exactly one word from this list: "
-    "Technology, Business, Science, Culture, Other. Output nothing else."
-)
+SYSTEMS = {
+    "classify": (
+        "You classify notes. Answer with exactly one word from this list: "
+        "Technology, Business, Science, Culture, Other. Output nothing else."
+    ),
+    "summarize": (
+        "You summarize notes in exactly one sentence. Keep names and "
+        "deadlines. Output only the summary sentence. /no_think"
+    ),
+    "extract": (
+        'You extract structured data from notes. Output only strict JSON with '
+        'these keys: people, organizations, locations, action_items. Each '
+        'value is a list of strings. Output nothing else. /no_think'
+    ),
+}
 
 PEOPLE = [
     "Sara", "Miguel", "Priya", "Tom", "Aisha", "Kenji", "Lena", "Omar",
@@ -26,88 +41,157 @@ COMPANIES = [
     "Acme Corp", "Northwind Ltd", "Vertex Labs", "BlueHarbor", "KappaWorks",
     "Stonebridge", "Nimbus AI", "Helios Energy", "Ferrum Freight", "Solstice Media",
 ]
-TOPICS = {
+LOCATIONS = [
+    "the Singapore lab", "the Berlin office", "Warehouse 9", "Studio B",
+    "the rooftop garden", "Hall 3", "the Osaka branch", "Meeting Room 4",
+]
+DELIVERABLES = [
+    "the Q3 forecast slides", "the migration plan", "the safety report",
+    "the onboarding guide", "the prototype firmware", "the press draft",
+    "the budget sheet", "the field survey",
+]
+DEADLINES = [
+    "before Friday", "next week", "by end of month", "before the audit",
+    "once the numbers land", "before the deadline", "after the standup",
+]
+CATEGORY_SENTENCES = {
     "Technology": [
-        ("the {thing} rollout", ["API gateway", "Kubernetes cluster", "CI pipeline", "Swift 6 migration", "on-device model", "mesh network", "battery firmware", "VR headset prototype"]),
-        ("a bug in the {thing}", ["auth service", "payment webhook", "shader compiler", "camera driver", "sync client"]),
-        ("benchmarking the {thing}", ["new GPU", "quantized LLM", "SSD array", "edge router"]),
+        "{person} flagged a bug in the {thing}.",
+        "The {thing} rollout is behind schedule.",
+        "Benchmarking of the {thing} starts Monday.",
     ],
     "Business": [
-        ("the {thing} review", ["Q3 forecast", "pricing strategy", "vendor contract", "hiring plan", "board deck", "marketing budget"]),
-        ("renewal talks with {company}", []),
-        ("the {thing} proposal", ["merger", "seed round", "retail expansion", "cost-cutting plan"]),
+        "{company} asked about the renewal.",
+        "The pricing strategy review landed poorly.",
+        "{person} owns the hiring plan now.",
     ],
     "Science": [
-        ("the {thing} study results", ["genome", "coral reef", "vaccine trial", "exoplanet survey", "crispr", "dark matter detector"]),
-        ("lab work on {thing}", ["antenna tests", "soil samples", "protein folding", "neuron imaging"]),
-        ("a paper on {thing}", ["quantum error correction", "ocean salinity", "bird migration", "superconductors"]),
+        "The coral reef study enters phase two.",
+        "Lab work on soil samples stalled.",
+        "The exoplanet survey paper is out.",
     ],
     "Culture": [
-        ("the {thing} opening", ["film festival", "photo exhibition", "street art fair", "opera season", "indie game showcase"]),
-        ("a review of {thing}", ["the new novel", "the jazz album", "the museum wing", "the ballet premiere"]),
-        ("plans for {thing}", ["the poetry slam", "the heritage walk", "the food market", "the theater workshop"]),
+        "The film festival opening sold out.",
+        "Reviews of the new novel are mixed.",
+        "The heritage walk needs a new route.",
     ],
     "Other": [
-        ("the {thing} appointment", ["dentist", "visa office", "apartment viewing", "car service"]),
-        ("packing for {thing}", ["the hiking trip", "the family reunion", "the move across town"]),
-        ("a reminder about {thing}", ["watering the plants", "renewing the passport", "the neighborhood watch meeting"]),
+        "{person} has a dentist appointment.",
+        "Packing for the hiking trip started.",
+        "The neighborhood watch meeting moved.",
     ],
 }
-
-ACTIONS = [
-    "before Friday", "next week", "by end of month", "after the standup",
-    "before the audit", "once the numbers land", "before the deadline",
+CATEGORY_THINGS = {
+    "Technology": ["auth service", "CI pipeline", "shader compiler", "edge router"],
+    "Business": ["vendor contract", "board deck", "seed round", "cost-cutting plan"],
+    "Science": ["vaccine trial", "protein folding", "ocean salinity", "superconductors"],
+    "Culture": ["opera season", "jazz album", "museum wing", "poetry slam"],
+    "Other": ["visa office", "apartment viewing", "car service", "passport renewal"],
+}
+FILLERS = [
+    "Notes are scattered but the gist is clear.",
+    "No firm decision yet.",
+    "Follow-up expected soon.",
+    "Check the shared folder for details.",
 ]
 
 
-def sentence(label: str) -> str:
-    person = random.choice(PEOPLE)
-    kind = random.choice(TOPICS[label])
-    slot = random.choice(kind[1]) if kind[1] else random.choice(COMPANIES)
-    text = kind[0].format(thing=slot, company=random.choice(COMPANIES))
-    verb = random.choice(["wants", "asked about", "flagged", "owns", "pushed back on"])
-    tail = random.choice(ACTIONS)
-    return f"{person} {verb} {text} {tail}."
+def classify_example() -> tuple[str, str]:
+    label = random.choice(LABELS)
+    parts = []
+    for _ in range(random.randint(2, 3)):
+        tpl = random.choice(CATEGORY_SENTENCES[label])
+        parts.append(tpl.format(
+            person=random.choice(PEOPLE),
+            company=random.choice(COMPANIES),
+            thing=random.choice(CATEGORY_THINGS[label]),
+        ))
+    parts.append(random.choice(FILLERS))
+    return " ".join(parts), label
 
 
-def article(label: str) -> str:
-    n = random.randint(2, 4)
-    parts = [sentence(label) for _ in range(n)]
-    filler = random.choice([
-        "Notes are scattered but the gist is clear.",
-        "No firm decision yet.",
-        "Follow-up expected soon.",
-        "Check the shared folder for details.",
-    ])
-    return " ".join(parts) + " " + filler
+def facts() -> list[dict]:
+    """Shared ground truth: 2-3 typed facts rendered by summarize/extract."""
+    out = []
+    for _ in range(random.randint(2, 3)):
+        kind = random.choice(["action", "org", "place"])
+        if kind == "action":
+            out.append({
+                "person": random.choice(PEOPLE),
+                "text": f"{random.choice(PEOPLE)} wants {random.choice(DELIVERABLES)} {random.choice(DEADLINES)}.",
+            })
+        elif kind == "org":
+            out.append({
+                "org": random.choice(COMPANIES),
+                "text": f"{random.choice(COMPANIES)} asked about the renewal {random.choice(DEADLINES)}.",
+            })
+        else:
+            out.append({
+                "place": random.choice(LOCATIONS),
+                "text": f"The review session is at {random.choice(LOCATIONS)}.",
+            })
+    return out
 
 
-def example(label: str) -> dict:
-    return {
-        "messages": [
-            {"role": "system", "content": SYSTEM},
-            {"role": "user", "content": article(label)},
-            {"role": "assistant", "content": label},
-        ]
-    }
+def summarize_example() -> tuple[str, str]:
+    fs = facts()
+    article = " ".join(f["text"] for f in fs) + " " + random.choice(FILLERS)
+    summary = " ".join(f["text"] for f in fs)
+    return article, summary
+
+
+def extract_example() -> tuple[str, str]:
+    fs = facts()
+    article = " ".join(f["text"] for f in fs) + " " + random.choice(FILLERS)
+    slots = {"people": [], "organizations": [], "locations": [], "action_items": []}
+    for f in fs:
+        if "person" in f:
+            name = f["person"]
+            if name not in slots["people"]:
+                slots["people"].append(name)
+            if f["text"] not in slots["action_items"]:
+                slots["action_items"].append(f["text"])
+        elif "org" in f:
+            if f["org"] not in slots["organizations"]:
+                slots["organizations"].append(f["org"])
+        elif "place" in f:
+            if f["place"] not in slots["locations"]:
+                slots["locations"].append(f["place"])
+    return article, json.dumps(slots)
+
+
+MAKERS = {
+    "classify": classify_example,
+    "summarize": summarize_example,
+    "extract": extract_example,
+}
 
 
 def main() -> None:
-    out = Path(__file__).parent / "data" / "classify"
-    out.mkdir(parents=True, exist_ok=True)
-
-    train, valid = [], []
-    for label in LABELS:
-        train += [example(label) for _ in range(120)]
-        valid += [example(label) for _ in range(20)]
-    random.shuffle(train)
-    random.shuffle(valid)
-
-    (out / "train.jsonl").write_text(
-        "\n".join(json.dumps(e) for e in train) + "\n")
-    (out / "valid.jsonl").write_text(
-        "\n".join(json.dumps(e) for e in valid) + "\n")
-    print(f"train={len(train)} valid={len(valid)} -> {out}")
+    base = Path(__file__).parent / "data"
+    for task, maker in MAKERS.items():
+        out = base / task
+        out.mkdir(parents=True, exist_ok=True)
+        train, valid = [], []
+        for _ in range(600):
+            article, answer = maker()
+            train.append({"messages": [
+                {"role": "system", "content": SYSTEMS[task]},
+                {"role": "user", "content": article},
+                {"role": "assistant", "content": answer},
+            ]})
+        for _ in range(100):
+            article, answer = maker()
+            valid.append({"messages": [
+                {"role": "system", "content": SYSTEMS[task]},
+                {"role": "user", "content": article},
+                {"role": "assistant", "content": answer},
+            ]})
+        (out / "train.jsonl").write_text(
+            "\n".join(json.dumps(e) for e in train) + "\n")
+        (out / "valid.jsonl").write_text(
+            "\n".join(json.dumps(e) for e in valid) + "\n")
+        print(f"{task}: train={len(train)} valid={len(valid)} -> {out}")
 
 
 if __name__ == "__main__":

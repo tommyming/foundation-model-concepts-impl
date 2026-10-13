@@ -42,4 +42,8 @@ targets:
         GENERATE_INFOPLIST_FILE: true
         INFOPLIST_KEY_UILaunchScreen_Generation: true
         TARGETED_DEVICE_FAMILY: "1"
-        # ponytail: add com.apple.developer.kernel.increased-memory-limit in Phase 4 if the 3-instance naive mode hits jetsam.
+    entitlements:
+      path: AIMemoryLab.entitlements
+      properties:
+        # Phase 4: three resident model instances in naive mode.
+        com.apple.developer.kernel.increased-memory-limit: true

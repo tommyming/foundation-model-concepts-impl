@@ -7,18 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3808E566FB94B90042F44F81 /* Signposts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889A4C2C5215B31B370839CE /* Signposts.swift */; };
 		5070FA6F116132F4B7DC41F8 /* adapters in Resources */ = {isa = PBXBuildFile; fileRef = AB694E117E3DCFEE29D49A54 /* adapters */; };
+		5BB0E9B81A83896CED47ED21 /* Memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33FCB5E93775A1C000BE520D /* Memory.swift */; };
 		5F958D4271B9D2B0EF592F20 /* TokenizerLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A414655C04002AB906020F1F /* TokenizerLoader.swift */; };
 		7FF857BF9F0FB3C33F325F58 /* Tokenizers in Frameworks */ = {isa = PBXBuildFile; productRef = D562CF0FD6AC3F759543FE21 /* Tokenizers */; };
 		8D90D6214D797082EC2BA09D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7050079C63F0172DC25C2D70 /* ContentView.swift */; };
 		A94C1C06E5C413847BCEFDC4 /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = F839AAB920360C44C124511D /* MLXLMCommon */; };
 		AE144473B4520EA30ED7BBA7 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D27BFF24CE097AE3BEA1A86D /* AppModel.swift */; };
 		C2FD8F05B5DAFF3F3051CEDE /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = 730A48BDD9E0BFC598D5A1A7 /* MLXLLM */; };
+		F3DF5D3DC1F44BB1193D8DD4 /* Benchmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E1E62BB29E2A9AEBB24282C /* Benchmark.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		09BBC5E10F199361B7D99DEE /* AIMemoryLab.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AIMemoryLab.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		33FCB5E93775A1C000BE520D /* Memory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Memory.swift; sourceTree = "<group>"; };
+		3E1E62BB29E2A9AEBB24282C /* Benchmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Benchmark.swift; sourceTree = "<group>"; };
 		7050079C63F0172DC25C2D70 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		889A4C2C5215B31B370839CE /* Signposts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signposts.swift; sourceTree = "<group>"; };
 		A414655C04002AB906020F1F /* TokenizerLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenizerLoader.swift; sourceTree = "<group>"; };
 		AB694E117E3DCFEE29D49A54 /* adapters */ = {isa = PBXFileReference; lastKnownFileType = folder; name = adapters; path = Resources/adapters; sourceTree = SOURCE_ROOT; };
 		D27BFF24CE097AE3BEA1A86D /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
@@ -42,7 +48,10 @@
 			isa = PBXGroup;
 			children = (
 				D27BFF24CE097AE3BEA1A86D /* AppModel.swift */,
+				3E1E62BB29E2A9AEBB24282C /* Benchmark.swift */,
 				7050079C63F0172DC25C2D70 /* ContentView.swift */,
+				33FCB5E93775A1C000BE520D /* Memory.swift */,
+				889A4C2C5215B31B370839CE /* Signposts.swift */,
 				A414655C04002AB906020F1F /* TokenizerLoader.swift */,
 			);
 			path = Sources;
@@ -149,7 +158,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				AE144473B4520EA30ED7BBA7 /* AppModel.swift in Sources */,
+				F3DF5D3DC1F44BB1193D8DD4 /* Benchmark.swift in Sources */,
 				8D90D6214D797082EC2BA09D /* ContentView.swift in Sources */,
+				5BB0E9B81A83896CED47ED21 /* Memory.swift in Sources */,
+				3808E566FB94B90042F44F81 /* Signposts.swift in Sources */,
 				5F958D4271B9D2B0EF592F20 /* TokenizerLoader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -161,6 +173,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = AIMemoryLab.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -234,6 +247,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = AIMemoryLab.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
