@@ -11,19 +11,8 @@ at each step of the shared-adapter sequential scenario.
 
 import argparse
 import json
-import sys
 from pathlib import Path
-
-
-def median(values):
-    ys = sorted(values)
-    n = len(ys)
-    if n == 0:
-        raise SystemExit("median of an empty list")
-    mid = n // 2
-    if n % 2:
-        return ys[mid]
-    return (ys[mid - 1] + ys[mid]) / 2
+from statistics import median
 
 
 def load(path: Path):

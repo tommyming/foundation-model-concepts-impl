@@ -46,7 +46,7 @@ private struct SystemModelExtractionView: View {
     }
 
     private func refreshAvailability() {
-        status = Self.describe(SystemLanguageModel.default.availability)
+        status = String(describing: SystemLanguageModel.default.availability)
     }
 
     private func extract() async {
@@ -75,20 +75,6 @@ private struct SystemModelExtractionView: View {
         }
     }
 
-    private static func describe(_ availability: SystemLanguageModel.Availability) -> String {
-        switch availability {
-        case .available:
-            return "available"
-        case .unavailable(.deviceNotEligible):
-            return "unavailable: deviceNotEligible"
-        case .unavailable(.appleIntelligenceNotEnabled):
-            return "unavailable: appleIntelligenceNotEnabled"
-        case .unavailable(.modelNotReady):
-            return "unavailable: modelNotReady"
-        @unknown default:
-            return "unavailable"
-        }
-    }
 }
 
 @available(iOS 26, *)

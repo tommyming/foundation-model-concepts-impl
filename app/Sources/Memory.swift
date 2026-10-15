@@ -10,7 +10,6 @@ import os
 struct MemorySnapshot: Codable, Sendable {
     let physicalFootprintBytes: UInt64
     let peakPhysicalFootprintBytes: UInt64
-    let residentBytes: UInt64
 
     var physicalFootprintMB: Double { Double(physicalFootprintBytes) / 1_048_576 }
     var peakPhysicalFootprintMB: Double { Double(peakPhysicalFootprintBytes) / 1_048_576 }
@@ -26,12 +25,11 @@ func readMemory() -> MemorySnapshot {
         }
     }
     guard kr == KERN_SUCCESS else {
-        return MemorySnapshot(physicalFootprintBytes: 0, peakPhysicalFootprintBytes: 0, residentBytes: 0)
+        return MemorySnapshot(physicalFootprintBytes: 0, peakPhysicalFootprintBytes: 0)
     }
     return MemorySnapshot(
         physicalFootprintBytes: info.phys_footprint,
-        peakPhysicalFootprintBytes: UInt64(bitPattern: info.ledger_phys_footprint_peak),
-        residentBytes: UInt64(info.resident_size))
+        peakPhysicalFootprintBytes: UInt64(bitPattern: info.ledger_phys_footprint_peak))
 }
 
 /// Polls phys_footprint about every 50 ms. The result is a phase peak, not the lifetime ledger peak.
