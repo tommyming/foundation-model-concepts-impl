@@ -94,8 +94,8 @@ python3 benchmarks/analysis/plot.py benchmarks/results/*.json --out presentation
 
 The script writes:
 
-- `presentation/figures/chart-a-memory.png` — `memoryAfterMB` after each step of `sequential-three-tasks`, one line per architecture present in the files. This is the sample after the step. It is not `phasePeakMB` and not `lifetimePeakMB`.
-- `presentation/figures/chart-b-latency.png` — one `shared-adapter` sequential run, stacked as `adapterSwitchMs`, then `ttftMs`, then `totalMs - ttftMs`.
+- `presentation/figures/chart-a-memory.png` — median `phasePeakMB` at each step of `sequential-three-tasks`, one line per architecture. The script refuses a file that has no `phasePeakMB`. It does not plot `memoryAfterMB` or `lifetimePeakMB`.
+- `presentation/figures/chart-b-latency.png` — median `adapterSwitchMs`, `ttftMs`, and `totalMs - ttftMs` at each step of the shared-adapter sequential scenario.
 
 Chart A skips an architecture that has no sequential runs. Pass both exports if you want both lines.
 
