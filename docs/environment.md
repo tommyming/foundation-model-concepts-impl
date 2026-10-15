@@ -7,7 +7,7 @@ Fill in per benchmark session; every published number names this file (handoff Â
 | Date | TBD |
 | macOS version | 26.6.2 (25G83) |
 | Xcode version | 26.6 (17F113) |
-| Swift version | TBD (`swift --version`) |
+| Swift version | 6.3.3 (swiftlang-6.3.3.1.3 clang-2100.1.1.101), from `xcrun swift --version` |
 | iOS SDK | 26.5 |
 | Device model | TBD |
 | Device OS | TBD |

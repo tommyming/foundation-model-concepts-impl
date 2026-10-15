@@ -7,12 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		122EBD552C1DA2B4639DC6B5 /* FoundationModelsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 177F552FCBCE622EBEA60EF8 /* FoundationModelsSection.swift */; };
+		1AB554AAAA2743D11EFABCA2 /* Qwen3-1.7B-4bit in Resources */ = {isa = PBXBuildFile; fileRef = F45D02DF8F67AEB5A5659711 /* Qwen3-1.7B-4bit */; };
 		3808E566FB94B90042F44F81 /* Signposts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 889A4C2C5215B31B370839CE /* Signposts.swift */; };
 		5070FA6F116132F4B7DC41F8 /* adapters in Resources */ = {isa = PBXBuildFile; fileRef = AB694E117E3DCFEE29D49A54 /* adapters */; };
 		5BB0E9B81A83896CED47ED21 /* Memory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33FCB5E93775A1C000BE520D /* Memory.swift */; };
 		5F958D4271B9D2B0EF592F20 /* TokenizerLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A414655C04002AB906020F1F /* TokenizerLoader.swift */; };
 		7FF857BF9F0FB3C33F325F58 /* Tokenizers in Frameworks */ = {isa = PBXBuildFile; productRef = D562CF0FD6AC3F759543FE21 /* Tokenizers */; };
 		8D90D6214D797082EC2BA09D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7050079C63F0172DC25C2D70 /* ContentView.swift */; };
+		9357586A964AB18A33CC3009 /* FoundationModels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18E0E415D0744544A404469C /* FoundationModels.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A94C1C06E5C413847BCEFDC4 /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = F839AAB920360C44C124511D /* MLXLMCommon */; };
 		AE144473B4520EA30ED7BBA7 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D27BFF24CE097AE3BEA1A86D /* AppModel.swift */; };
 		C2FD8F05B5DAFF3F3051CEDE /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = 730A48BDD9E0BFC598D5A1A7 /* MLXLLM */; };
@@ -21,6 +24,8 @@
 
 /* Begin PBXFileReference section */
 		09BBC5E10F199361B7D99DEE /* AIMemoryLab.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = AIMemoryLab.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		177F552FCBCE622EBEA60EF8 /* FoundationModelsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationModelsSection.swift; sourceTree = "<group>"; };
+		18E0E415D0744544A404469C /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
 		33FCB5E93775A1C000BE520D /* Memory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Memory.swift; sourceTree = "<group>"; };
 		3E1E62BB29E2A9AEBB24282C /* Benchmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Benchmark.swift; sourceTree = "<group>"; };
 		7050079C63F0172DC25C2D70 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -28,6 +33,7 @@
 		A414655C04002AB906020F1F /* TokenizerLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenizerLoader.swift; sourceTree = "<group>"; };
 		AB694E117E3DCFEE29D49A54 /* adapters */ = {isa = PBXFileReference; lastKnownFileType = folder; name = adapters; path = Resources/adapters; sourceTree = SOURCE_ROOT; };
 		D27BFF24CE097AE3BEA1A86D /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		F45D02DF8F67AEB5A5659711 /* Qwen3-1.7B-4bit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "Qwen3-1.7B-4bit"; path = "Resources/Qwen3-1.7B-4bit"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,6 +44,7 @@
 				C2FD8F05B5DAFF3F3051CEDE /* MLXLLM in Frameworks */,
 				A94C1C06E5C413847BCEFDC4 /* MLXLMCommon in Frameworks */,
 				7FF857BF9F0FB3C33F325F58 /* Tokenizers in Frameworks */,
+				9357586A964AB18A33CC3009 /* FoundationModels.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,6 +57,7 @@
 				D27BFF24CE097AE3BEA1A86D /* AppModel.swift */,
 				3E1E62BB29E2A9AEBB24282C /* Benchmark.swift */,
 				7050079C63F0172DC25C2D70 /* ContentView.swift */,
+				177F552FCBCE622EBEA60EF8 /* FoundationModelsSection.swift */,
 				33FCB5E93775A1C000BE520D /* Memory.swift */,
 				889A4C2C5215B31B370839CE /* Signposts.swift */,
 				A414655C04002AB906020F1F /* TokenizerLoader.swift */,
@@ -62,6 +70,7 @@
 			children = (
 				4FF106C8B6BDD067325D8BCE /* Resources */,
 				36A6C4EAAE985C2A78DAD6DC /* Sources */,
+				B5886CBA7B5555465B166F4E /* Frameworks */,
 				8B2B938811144AEC84652B09 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -70,6 +79,7 @@
 			isa = PBXGroup;
 			children = (
 				AB694E117E3DCFEE29D49A54 /* adapters */,
+				F45D02DF8F67AEB5A5659711 /* Qwen3-1.7B-4bit */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -80,6 +90,14 @@
 				09BBC5E10F199361B7D99DEE /* AIMemoryLab.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B5886CBA7B5555465B166F4E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				18E0E415D0744544A404469C /* FoundationModels.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -146,6 +164,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1AB554AAAA2743D11EFABCA2 /* Qwen3-1.7B-4bit in Resources */,
 				5070FA6F116132F4B7DC41F8 /* adapters in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -160,6 +179,7 @@
 				AE144473B4520EA30ED7BBA7 /* AppModel.swift in Sources */,
 				F3DF5D3DC1F44BB1193D8DD4 /* Benchmark.swift in Sources */,
 				8D90D6214D797082EC2BA09D /* ContentView.swift in Sources */,
+				122EBD552C1DA2B4639DC6B5 /* FoundationModelsSection.swift in Sources */,
 				5BB0E9B81A83896CED47ED21 /* Memory.swift in Sources */,
 				3808E566FB94B90042F44F81 /* Signposts.swift in Sources */,
 				5F958D4271B9D2B0EF592F20 /* TokenizerLoader.swift in Sources */,
@@ -180,6 +200,11 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-weak_framework",
+					FoundationModels,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosconf.AIMemoryLab;
 				SDKROOT = iphoneos;
@@ -254,6 +279,11 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-weak_framework",
+					FoundationModels,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.iosconf.AIMemoryLab;
 				SDKROOT = iphoneos;

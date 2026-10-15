@@ -31,9 +31,8 @@ Run:
 
 1. Open `app/AIMemoryLab.xcodeproj`, set your signing team.
 2. Select your iPhone, press Cmd+R.
-3. Tap **Preload** (loads the base model once), then any task button.
-4. In Shared mode, watch **Adapter** change per task; in Naive mode, watch the
-   resident-instance list grow to three.
+3. Shared mode: tap **Preload**, then a task button. The base loads once. The adapter name changes per task.
+4. Naive mode: tap **Reset** if you already preloaded, switch the mode, tap **Prepare**. Prepare loads no model. The first tap of each task loads that instance only.
 
 The three task adapters ship in `app/Resources/adapters/` (trained artifacts,
 committed). Retrain them with the configs in `training/` (see below).

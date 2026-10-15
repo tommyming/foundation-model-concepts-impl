@@ -1,7 +1,11 @@
 // task_vm_info reader: phys_footprint (the jetsam metric) + lifetime peak.
 // Metric definitions: see docs/research/memory-and-instruments.md.
+//
+// phase peak is the max phys_footprint sampled during one load, switch, or
+// inference phase. It is not ledger_phys_footprint_peak, which is process lifetime.
 
 import Foundation
+import os
 
 struct MemorySnapshot: Codable, Sendable {
     let physicalFootprintBytes: UInt64
@@ -28,4 +32,37 @@ func readMemory() -> MemorySnapshot {
         physicalFootprintBytes: info.phys_footprint,
         peakPhysicalFootprintBytes: UInt64(bitPattern: info.ledger_phys_footprint_peak),
         residentBytes: UInt64(info.resident_size))
+}
+
+/// Polls phys_footprint about every 50 ms. The result is a phase peak, not the lifetime ledger peak.
+final class PhasePeakSampler: @unchecked Sendable {
+    private let peak = OSAllocatedUnfairLock(initialState: UInt64(0))
+    private var task: Task<Void, Never>?
+
+    func start() {
+        sample()
+        task = Task.detached { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .milliseconds(50))
+                if Task.isCancelled { break }
+                self?.sample()
+            }
+        }
+    }
+
+    func stop() async -> Double {
+        task?.cancel()
+        await task?.value
+        task = nil
+        sample()
+        let bytes = peak.withLock { $0 }
+        return Double(bytes) / 1_048_576
+    }
+
+    private func sample() {
+        let bytes = readMemory().physicalFootprintBytes
+        peak.withLock { value in
+            if bytes > value { value = bytes }
+        }
+    }
 }

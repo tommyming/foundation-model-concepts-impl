@@ -15,12 +15,18 @@ struct ContentView: View {
         NavigationStack {
             Form {
                 Section("Runtime") {
-                    Picker("Mode", selection: $model.mode) {
+                    Picker("Mode", selection: Binding(
+                        get: { model.mode },
+                        set: { newMode in
+                            guard !benchRunning else { return }
+                            model.switchMode(to: newMode)
+                        }
+                    )) {
                         Text("Naive").tag(AppModel.Mode.naive)
                         Text("Shared Base + Adapters").tag(AppModel.Mode.sharedBase)
                     }
                     .pickerStyle(.segmented)
-                    .disabled(model.isBusy)
+                    .disabled(model.isBusy || benchRunning)
 
                     HStack {
                         Text(model.state.rawValue.capitalized)
@@ -30,11 +36,15 @@ struct ContentView: View {
                         }
                     }
                     if model.state == .idle {
-                        Button("Preload") { Task { await model.loadBase() } }
+                        if model.mode == .sharedBase {
+                            Button("Preload") { Task { await model.loadBase() } }
+                        } else {
+                            Button("Prepare") { model.prepareNaive() }
+                        }
                     }
                     if model.state != .idle {
                         Button("Unload / Reset", role: .destructive) { model.reset() }
-                            .disabled(model.isBusy)
+                            .disabled(model.isBusy || benchRunning)
                     }
                 }
 
@@ -60,9 +70,15 @@ struct ContentView: View {
                         ForEach(AITask.allCases, id: \.self) { t in
                             Button(t.rawValue.capitalized) { model.run(task: t, input: prompt) }
                                 .buttonStyle(.bordered)
-                                .disabled(model.state != .ready)
+                                .disabled(model.state != .ready || benchRunning)
                         }
                     }
+                    Button("Run Sequence") { model.runSequence(input: prompt) }
+                        .disabled(model.state != .ready || benchRunning)
+                    Button("Run Repeated") { model.runRepeated(input: prompt) }
+                        .disabled(model.state != .ready || benchRunning)
+                    Button("Clear Context") { model.clearContext() }
+                        .disabled(model.state != .ready || benchRunning)
                     if model.state == .running {
                         Button("Cancel", role: .destructive) { model.cancel() }
                     }
@@ -75,7 +91,10 @@ struct ContentView: View {
                     LabeledContent("Footprint", value: model.lastMetrics.map {
                         String(format: "%.0f MB", $0.memoryAfter.physicalFootprintMB)
                     } ?? "—")
-                    LabeledContent("Peak footprint", value: model.lastMetrics.map {
+                    LabeledContent("Phase peak", value: model.lastMetrics.map {
+                        String(format: "%.0f MB", $0.phasePeakMB)
+                    } ?? "—")
+                    LabeledContent("Lifetime peak", value: model.lastMetrics.map {
                         String(format: "%.0f MB", $0.memoryAfter.peakPhysicalFootprintMB)
                     } ?? "—")
                 }
@@ -98,6 +117,8 @@ struct ContentView: View {
                             .textSelection(.enabled)
                     }.frame(minHeight: 160)
                 }
+
+                FoundationModelsSection(input: prompt)
 
                 if let err = model.errorText {
                     Section { Text(err).foregroundStyle(.red) }

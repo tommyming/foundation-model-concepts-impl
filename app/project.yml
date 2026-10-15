@@ -27,6 +27,9 @@ targets:
       - path: Resources/adapters
         type: folder
         buildPhase: resources
+      - path: Resources/Qwen3-1.7B-4bit
+        type: folder
+        buildPhase: resources
     dependencies:
       # MLXHuggingFace/MLXFoundationModels deliberately excluded: they need
       # iOS 27 SDK symbols; Phase 1 loads everything from the local bundle.
@@ -37,13 +40,25 @@ targets:
       - package: swift-transformers
         products:
           - Tokenizers
+      # iOS 26 framework on an iOS 17 deployment target. Weak so older OS launches.
+      - sdk: FoundationModels.framework
+        weak: true
     settings:
       base:
         GENERATE_INFOPLIST_FILE: true
         INFOPLIST_KEY_UILaunchScreen_Generation: true
         TARGETED_DEVICE_FAMILY: "1"
+        OTHER_LDFLAGS: ["$(inherited)", "-weak_framework", "FoundationModels"]
     entitlements:
       path: AIMemoryLab.entitlements
       properties:
         # Phase 4: three resident model instances in naive mode.
         com.apple.developer.kernel.increased-memory-limit: true
+
+schemes:
+  AIMemoryLab:
+    build:
+      targets:
+        AIMemoryLab: all
+    run:
+      config: Debug

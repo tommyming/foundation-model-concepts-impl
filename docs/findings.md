@@ -28,6 +28,16 @@ Mac, [documented] from sources, [inferred] reasoning, [pending] to measure.
    QLoRA fine** and writes the standard MLX-native adapter format the Swift
    side expects. [measured-mac]
 
+## Fixed in code on 2026-10-15, not yet measured on a phone
+
+- Naive **Prepare** loads zero models. A mode switch calls `reset()` first, so the shared base cannot stay resident in naive mode. [code]
+- Time to first token starts after adapter switch or naive load. `adapterSwitchMs` and `modelLoadMs` are separate fields. [code]
+- `Benchmark.runAll` calls `clearContext()` before every iteration. [code]
+- `fail()` returns to `.ready` when a model is still resident, so **Reset** stays available. [code]
+- `phasePeakMB` is a ~50 ms poll of `phys_footprint`. `lifetimePeakMB` is `ledger_phys_footprint_peak`. They are different fields. [code]
+- Cold-start, Run Sequence, Run Repeated, and Clear Context exist in the UI. [code]
+- A weak-linked Foundation Models section compiles on the iOS 26.5 SDK. It does not load MLX. [code, simulator build succeeded 2026-10-15]
+
 ## Open items (device runs pending)
 
 - Adapter switch latency (`unload`+`load` on device) — [pending]
