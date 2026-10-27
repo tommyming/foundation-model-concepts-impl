@@ -36,7 +36,7 @@ Every shipped candidate in the table is a 4-bit MLX repo, except SmolLM2, which 
 
 Sizes in the table are weight-file sizes or repo-storage sizes from the Hugging Face metadata cited in `docs/research/model-candidates.md`. They are not resident memory and not `phys_footprint`.
 
-The selected weights file is 0.97 GB (968,080,210 bytes) in that note. `README.md` describes the download as about 940 MB. `scripts/fetch-model.sh` downloads `resolve/main`. The commit is still TBD in `docs/environment.md`. Do not treat two downloads as the same bytes until that commit is filled in.
+The selected weights file is 0.97 GB (968,080,210 bytes) in that note. `README.md` describes the download as about 940 MB. `scripts/fetch-model.sh` downloads commit `3b1b1768f8f8cf8351c712464f906e86c2b8269e`. The same commit is in `docs/environment.md`.
 
 Each shipped adapter file is about 20 MB on disk. That fact is in `training/README.md`. It is not a device footprint.
 

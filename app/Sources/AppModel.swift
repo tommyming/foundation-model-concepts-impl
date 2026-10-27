@@ -401,6 +401,7 @@ final class AppModel: ObservableObject {
 
     private func fail(_ message: String) {
         errorText = message
+        lastMetrics = nil
         // A loaded runtime must stay Reset-able. Idle is only for an empty process.
         state = hasResidentModel ? .ready : .idle
         log.error("ModelManager: \(message, privacy: .public)")
