@@ -30,7 +30,7 @@ cd app && xcodegen generate
 Run:
 
 1. Open `app/AIMemoryLab.xcodeproj`, set your signing team.
-2. Select your iPhone, press Cmd+R.
+2. Select your iPhone. Use Product > Profile, or stop the debugger before Run Scenarios.
 3. Shared mode: tap **Preload**, then a task button. The base loads once. The adapter name changes per task.
 4. Naive mode: tap **Reset** if you already preloaded, switch the mode, tap **Prepare**. Prepare loads no model. The first tap of each task loads that instance only.
 
@@ -71,7 +71,7 @@ QLoRA against the exact 4-bit checkpoint the app ships (rank 8, scale 20, last
 
 ## Measurement notes
 
-- Published memory metric: `task_vm_info.phys_footprint` (jetam-enforced,
+- Published memory metric: `task_vm_info.phys_footprint` (jetsam-enforced,
   includes Metal/GPU allocations). See
   `docs/research/memory-and-instruments.md` for why this and not `resident_size`.
 - Benchmark JSON exports via the share sheet in-app; charts:

@@ -1,5 +1,6 @@
 // Benchmark scenarios (handoff §10) + machine-readable JSON output (§14).
 
+import Darwin
 import Foundation
 
 struct BenchmarkStep: Codable {
@@ -14,12 +15,15 @@ struct BenchmarkStep: Codable {
     let phasePeakMB: Double
     /// ledger_phys_footprint_peak at the end of the step.
     let lifetimePeakMB: Double
+    let inputTokens: Int?
+    let outputTokens: Int?
 }
 
 struct BenchmarkRun: Codable {
     let scenario: String
     let architecture: String
     let measuredIteration: Int
+    let thermalState: Int
     let steps: [BenchmarkStep]
 }
 
@@ -32,7 +36,7 @@ struct BenchmarkReport: Codable {
         let os: String
         let model: String
         let adapters: String
-        let thermalState: Int
+        let debuggerAttached: Bool
     }
 }
 
@@ -56,11 +60,11 @@ enum Benchmark {
     ) async throws -> URL {
         var runs: [BenchmarkRun] = []
         let architecture = model.mode == .sharedBase ? "shared-adapter" : "naive-independent"
-        let thermalState = ProcessInfo.processInfo.thermalState.rawValue
 
         for scenario in scenarios {
             let coldStart = scenario.name == coldStartName
             for iteration in 0...measured {
+                let thermalState = ProcessInfo.processInfo.thermalState.rawValue
                 if iteration == 0 {
                     progress("warm-up \(scenario.name)")
                 } else {
@@ -98,12 +102,15 @@ enum Benchmark {
                         memoryBeforeMB: m.memoryBefore.physicalFootprintMB,
                         memoryAfterMB: m.memoryAfter.physicalFootprintMB,
                         phasePeakMB: phasePeak,
-                        lifetimePeakMB: m.memoryAfter.peakPhysicalFootprintMB))
+                        lifetimePeakMB: m.memoryAfter.peakPhysicalFootprintMB,
+                        inputTokens: m.inputTokens,
+                        outputTokens: m.outputTokens))
                 }
                 if iteration > 0 {
                     runs.append(BenchmarkRun(
                         scenario: scenario.name, architecture: architecture,
-                        measuredIteration: iteration, steps: steps))
+                        measuredIteration: iteration, thermalState: thermalState,
+                        steps: steps))
                 }
             }
         }
@@ -114,7 +121,7 @@ enum Benchmark {
                 os: ProcessInfo.processInfo.operatingSystemVersionString,
                 model: "mlx-community/Qwen3-1.7B-4bit",
                 adapters: "summarize,classify,extract (rank 8, 16 layers)",
-                thermalState: thermalState),
+                debuggerAttached: debuggerAttached()),
             runs: runs)
 
         let dir = URL.applicationSupportDirectory
@@ -156,6 +163,14 @@ enum Benchmark {
     private static func ms(_ d: Duration) -> Double {
         Double(d.components.seconds) * 1000 + Double(d.components.attoseconds) / 1e15
     }
+}
+
+private func debuggerAttached() -> Bool {
+    var info = kinfo_proc()
+    var size = MemoryLayout<kinfo_proc>.stride
+    var mib: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()]
+    guard sysctl(&mib, 4, &info, &size, nil, 0) == 0 else { return false }
+    return (info.kp_proc.p_flag & P_TRACED) != 0
 }
 
 private extension utsname {

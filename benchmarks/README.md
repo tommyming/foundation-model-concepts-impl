@@ -60,8 +60,9 @@ Tap that share link. Save the file to the Mac (AirDrop or Files).
 Current keys:
 
 - `environment.device`, `environment.os`, `environment.model`, `environment.adapters`
-- `environment.thermalState` — `ProcessInfo.thermalState.rawValue`, captured once at the start of `runAll`
+- `environment.debuggerAttached` — true when the process is traced (`P_TRACED`). Do not publish a file where this is true.
 - `runs[].scenario`, `runs[].architecture`, `runs[].measuredIteration`
+- `runs[].thermalState` — `ProcessInfo.thermalState.rawValue`, captured at the start of each iteration
 - `steps[].task`
 - `steps[].adapterSwitchMs` — unload plus load. Nil if the adapter did not change. Not inside `ttftMs`.
 - `steps[].modelLoadMs` — naive `makeContainer()` when that task was not resident. On shared `cold-start`, this is `loadDuration` from `loadBase()`.
@@ -70,6 +71,8 @@ Current keys:
 - `steps[].memoryBeforeMB`, `steps[].memoryAfterMB` — `phys_footprint` samples
 - `steps[].phasePeakMB` — max polled `phys_footprint` for the step. On `cold-start`, also the max with the base-load sampler.
 - `steps[].lifetimePeakMB` — `ledger_phys_footprint_peak` at step end. Process lifetime. `reset()` does not clear it.
+- `steps[].inputTokens` — `GenerateCompletionInfo.totalPromptTokenCount`. Nil if the stream ended before the info event.
+- `steps[].outputTokens` — `GenerateCompletionInfo.generationTokenCount`. Same nil rule.
 
 There is no `peakFootprintMB` key and no `coldStartMs` key. Cold start is the scenario name `cold-start`, plus `modelLoadMs` on that step.
 

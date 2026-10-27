@@ -79,7 +79,7 @@ struct ContentView: View {
                         .disabled(model.state != .ready || benchRunning)
                     Button("Clear Context") { model.clearContext() }
                         .disabled(model.state != .ready || benchRunning)
-                    if model.state == .running {
+                    if model.state == .running, !benchRunning {
                         Button("Cancel", role: .destructive) { model.cancel() }
                     }
                 }

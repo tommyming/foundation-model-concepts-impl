@@ -36,6 +36,8 @@ struct RunMetrics: Sendable {
     var memoryAfter: MemorySnapshot
     /// Max phys_footprint sampled during this run's load, switch, and inference.
     var phasePeakMB: Double
+    var inputTokens: Int?
+    var outputTokens: Int?
 }
 
 @MainActor
@@ -182,6 +184,14 @@ final class AppModel: ObservableObject {
     /// Rebuilds chat sessions without unloading models or changing the active adapter.
     func clearContext() {
         guard !isBusy else { return }
+        rebuildSessions()
+        output = ""
+        DemoSignposts.event("ClearContext")
+        log.info("Context cleared; resident models kept")
+    }
+
+    /// No busy guard: perform() calls this while state is .running.
+    private func rebuildSessions() {
         session = nil
         naiveSessions.removeAll()
         if container != nil {
@@ -190,9 +200,6 @@ final class AppModel: ObservableObject {
         for (task, loaded) in naiveContainers {
             naiveSessions[task] = makeSession(loaded, instructions: task.instructions)
         }
-        output = ""
-        DemoSignposts.event("ClearContext")
-        log.info("Context cleared; resident models kept")
     }
 
     // MARK: - Running
@@ -235,6 +242,7 @@ final class AppModel: ObservableObject {
     }
 
     private func perform(task aITask: AITask, input: String) async {
+        rebuildSessions()
         output = ""
         errorText = nil
         let clock = ContinuousClock()
@@ -248,20 +256,33 @@ final class AppModel: ObservableObject {
             let sp = DemoSignposts.begin("Inference")
             var firstToken: Duration?
             var text = ""
+            var inputTokens: Int?
+            var outputTokens: Int?
             do {
-                for try await chunk in prepared.session.streamResponse(to: input) {
+                for try await event in prepared.session.streamDetails(to: input) {
                     if Task.isCancelled { break }
-                    if firstToken == nil {
-                        firstToken = clock.now - inferenceStart
-                        DemoSignposts.event("FirstToken")
-                        log.info("First token: \(secondsString(firstToken!), privacy: .public) s")
+                    if let chunk = event.chunk {
+                        if firstToken == nil {
+                            firstToken = clock.now - inferenceStart
+                            DemoSignposts.event("FirstToken")
+                            log.info("First token: \(secondsString(firstToken!), privacy: .public) s")
+                        }
+                        text += chunk
+                        output = text
+                    } else if let info = event.info {
+                        inputTokens = info.totalPromptTokenCount
+                        outputTokens = info.generationTokenCount
                     }
-                    text += chunk
-                    output = text
                 }
             } catch {
                 DemoSignposts.end("Inference", sp)
                 throw error
+            }
+            if Task.isCancelled {
+                DemoSignposts.end("Inference", sp)
+                _ = await sampler.stop()
+                fail("Cancelled")
+                return
             }
             DemoSignposts.end("Inference", sp)
             let total = clock.now - inferenceStart
@@ -274,7 +295,9 @@ final class AppModel: ObservableObject {
                 total: total,
                 memoryBefore: memoryBefore,
                 memoryAfter: readMemory(),
-                phasePeakMB: phasePeakMB)
+                phasePeakMB: phasePeakMB,
+                inputTokens: inputTokens,
+                outputTokens: outputTokens)
             log.info("Inference complete: \(secondsString(total), privacy: .public) s")
         } catch {
             _ = await sampler.stop()

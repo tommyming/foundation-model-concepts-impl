@@ -3,7 +3,7 @@
 # Weights are gitignored (1 GB). Run once before opening the Xcode project.
 set -e
 DEST="$(dirname "$0")/../app/Resources/Qwen3-1.7B-4bit"
-BASE="https://huggingface.co/mlx-community/Qwen3-1.7B-4bit/resolve/main"
+BASE="https://huggingface.co/mlx-community/Qwen3-1.7B-4bit/resolve/3b1b1768f8f8cf8351c712464f906e86c2b8269e"
 FILES=".gitattributes README.md added_tokens.json config.json merges.txt \
 model.safetensors model.safetensors.index.json special_tokens_map.json \
 tokenizer.json tokenizer_config.json vocab.json"

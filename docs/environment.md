@@ -19,7 +19,7 @@ Fill in per benchmark session; every published number names this file (handoff Â
 | Airplane mode | ON |
 | MLX Swift (mlx-swift-lm) | 3.32.3 |
 | mlx-swift | 0.32.x (see app/AIMemoryLab.xcodeproj Package.resolved) |
-| Base model | mlx-community/Qwen3-1.7B-4bit @ commit TBD |
+| Base model | mlx-community/Qwen3-1.7B-4bit @ commit 3b1b1768f8f8cf8351c712464f906e86c2b8269e |
 | Quantization | 4-bit groupwise (as shipped by mlx-community) |
 | Adapters | classify/summarize/extract, rank 8, scale 20, last 16 layers, QLoRA vs same 4-bit repo, iters 600, batch 4, lr 1e-5, mask-prompt on |
 | Generation settings | temperature 0, maxTokens 256 |
