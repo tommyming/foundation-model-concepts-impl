@@ -23,7 +23,10 @@ One-time setup:
 # 1. model weights (~940 MB, gitignored — restores into app/Resources/)
 ./scripts/fetch-model.sh
 
-# 2. regenerate the Xcode project after changing project.yml (needs xcodegen)
+# 2. measurement rules (no model load)
+python3 scripts/check-measure-rules.py
+
+# 3. regenerate the Xcode project after changing project.yml (needs xcodegen)
 cd app && xcodegen generate
 ```
 

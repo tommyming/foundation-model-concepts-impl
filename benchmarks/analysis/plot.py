@@ -67,14 +67,21 @@ def chart_a(all_runs, out: Path, plt):
     fig.savefig(out / "chart-a-memory.png", dpi=200)
 
 
+def required_ms(step, key):
+    value = step[key]
+    if value is None:
+        raise SystemExit(f"{step['task']} has no {key}; refuse to plot 0")
+    return value
+
+
 def chart_b(all_runs, out: Path, plt):
     runs = sequential(all_runs, "shared-adapter")
     if not runs:
         print("no shared-adapter sequential runs; skipping chart B")
         return
     labels, switch = median_by_step(runs, lambda s: s["adapterSwitchMs"] or 0)
-    _, ttft = median_by_step(runs, lambda s: s["ttftMs"] or 0)
-    _, rest = median_by_step(runs, lambda s: max(s["totalMs"] - (s["ttftMs"] or 0), 0))
+    _, ttft = median_by_step(runs, lambda s: required_ms(s, "ttftMs"))
+    _, rest = median_by_step(runs, lambda s: max(s["totalMs"] - required_ms(s, "ttftMs"), 0))
 
     fig, ax = plt.subplots(figsize=(8, 4.5))
     ax.bar(labels, switch, label="adapter switch")
@@ -97,6 +104,12 @@ def _selftest():
     ]
     _, peaks = median_by_step(runs, lambda s: s["phasePeakMB"])
     assert peaks == [20, 40], peaks
+    try:
+        required_ms({"task": "a", "ttftMs": None}, "ttftMs")
+    except SystemExit as error:
+        assert "refuse to plot 0" in str(error)
+    else:
+        raise AssertionError("null ttft was accepted")
     print("selftest ok")
 
 
