@@ -87,5 +87,14 @@ QLoRA against the exact 4-bit checkpoint the app ships (rank 8, scale 20, last
 - Synthetic training data: adapter outputs are template-shaped, good enough for
   the demo, not for production quality.
 - Adapter behavior on-device is verified manually, not by unit tests.
-- The Apple Foundation Models reference section (guided output on the system
-  model) is planned as a small Phase 7 addition, per `docs/decisions.md`.
+- The Apple Foundation Models section is in the app. It runs the system model
+  only and is not part of the MLX memory chart. The MLXFoundationModels bridge
+  stays out. See `docs/decisions.md` (D7).
+
+## License
+
+This repo is MIT. See `LICENSE`.
+
+The base model `mlx-community/Qwen3-1.7B-4bit` is Apache-2.0 and is not in git.
+The adapters in `app/Resources/adapters/` were trained on that checkpoint.
+https://www.apache.org/licenses/LICENSE-2.0
