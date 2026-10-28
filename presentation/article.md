@@ -6,26 +6,28 @@
 
 Here is a pattern spreading through iOS apps right now. The team ships an AI summarizer, so they bundle a model. Next quarter they add a classifier, so they bundle another model. Then an extractor, a recommender, a rewriter. Each feature owns its own model file, its own runtime, its own memory. Nobody planned this. Each decision was locally reasonable. On a phone, the bill arrives fast.
 
-This article walks through the alternative we built as a working demo. One frozen base model stays resident in memory. Three task-specific LoRA adapters hot-swap on it in milliseconds. A naive three-model mode exists purely to show what the old pattern costs. Everything runs on-device, from the app bundle, with airplane mode on.
+This article walks through the alternative we built as a working demo. One frozen base stays loaded. Three task adapters swap onto it without a second copy of the weights. A naive mode loads one full copy per task, so the cost of the old pattern is visible. The demo is built to run on-device from the app bundle.
 
-## The arithmetic that motivates everything
+No phone number in this draft is a result. Switch time is not measured. Resident memory is not measured. Do not quote either from this file. `presentation/numbers.md` stays empty until a device JSON exists.
 
-Our demo uses `mlx-community/Qwen3-1.7B-4bit` — a 1.7-billion-parameter model, 4-bit quantized, 968 MB on disk. Small by modern standards, and still enough for instruction following when a LoRA adapter does the task shaping.
+## The test checkpoint is not the model to ship
 
-The comparison:
+This demo was tested on one checkpoint, `mlx-community/Qwen3-1.7B-4bit`, commit `3b1b1768f8f8cf8351c712464f906e86c2b8269e`. The weight file is 968,080,210 bytes on disk, about 0.97 GB. That was a convenient test, not a recommendation. Pick your own base. The license, the file size, and whether your runtime can load it are your constraints.
 
-| Architecture | What sits in memory | Weights total |
-|---|---|---|
-| Naive: one model per feature | 3 × 968 MB | ~2.9 GB |
-| Shared: one base + three adapters | 968 MB + 3 × 20 MB | ~1.03 GB |
+The table is disk size for that test checkpoint. It is not `phys_footprint`. It is not resident memory.
 
-One adapter is about 2% of the base model. All three together cost about 6% of a single extra model instance. That ratio is the whole talk.
+| Architecture | Weight files on disk |
+|---|---|
+| Naive: one file per feature | 3 × 968 MB, about 2.9 GB |
+| Shared: one base file + three adapter files | 968 MB + 3 × 20 MB, about 1.03 GB |
+
+One adapter file is about 2% of that base file. That is why the experiment is worth running. How much of it stays resident on a phone is not in this draft.
 
 ## What a LoRA adapter actually is
 
 A LoRA (Low-Rank Adaptation) adapter freezes the base model and learns a small delta. For each adapted weight matrix, it learns two thin matrices — rank 8 in our case — whose product approximates the change the task needs. At inference, the layer computes `base(x) + scale · B(A(x))`. The base weights never change.
 
-We train each adapter against the exact 4-bit checkpoint the app ships, which makes it QLoRA. The adapter learns the task on top of the quantized weights the user's phone will actually run.
+We trained each adapter against that same test checkpoint, which makes the run QLoRA. An adapter has to match the weights you load. A different base means a new training run.
 
 The output of training is two small files:
 
@@ -83,7 +85,7 @@ There is also a zero-cost toggle, `setLoRAEnabled(false)`. It skips the LoRA mat
 The app tells the ownership story in three stages, deliberately reusing the same input note and the same three tasks:
 
 1. **Native.** One `LanguageModelSession` on Apple's frozen system model. One guided extraction. The app owns none of it.
-2. **Bundled, naive.** The same tasks, now on models the app owns — one full instance per feature. The resident list grows to three, and the footprint number climbs with each tap.
+2. **Bundled, naive.** The same tasks, now on models the app owns — one full instance per feature. The resident list grows to three. The footprint on screen is what you read off the phone. This draft does not record it.
 3. **Bundled, shared.** One base, three adapters, hot-swapped without an app restart. The base stays resident. Only the adapter name changes.
 
 Stage 2 and stage 3 run in the same process under the same metric, so they chart together. Stage 1 is a story beat and never appears on the memory chart. The system model is a different model in a different process, and pretending otherwise would be a false comparison.
@@ -96,9 +98,7 @@ Three measurement decisions worth stealing for any on-device benchmark:
 
 **Simulator numbers are not numbers.** macOS never jetsams the simulator process. The gauge stays green at memory levels that would kill the app on device. Final measurements come from a physical iPhone, debugger detached, airplane mode on.
 
-**Protocol beats discipline.** One warm-up run, five measured, median and range reported, environment recorded — device, OS, model revision, adapter revisions, thermal state. The demo app automates this and exports JSON with the metadata attached. Our article and slides cite that JSON. Nothing is hand-typed.
-
-*(Editor's note: device measurements — switch latency, time-to-first-token, footprint curves for both architectures — are being captured at the time of this draft. Placeholder values will be replaced with the exported JSON results and archived in the repo's `presentation/numbers.md`.)*
+**Protocol beats discipline.** One warm-up run, five measured, median and range reported, environment recorded — device, OS, model revision, adapter revisions, thermal state. The demo app can export that JSON. This draft does not cite it. Switch latency, time to first token, and both footprint curves are still unmeasured.
 
 ## What surprised us
 
@@ -117,8 +117,8 @@ Neither mode in the demo is "the right answer" in general. The rule is about own
 
 When the platform owns the model — Foundation Models, the OS-managed case — it enforces the discipline for you. When your app owns the model, that discipline becomes your job. The job has three parts: one owner for the base model's lifetime, adapters as explicit loadable resources, and every transition measured. The `ModelManager` actor in the demo is that discipline, written down in about 200 lines of Swift.
 
-One base model. Many tasks. Megabytes, not gigabytes.
+One owner for the base. Tasks as adapters. Measure the footprint before you publish a number.
 
 ---
 
-*The demo app, training pipeline, research notes, and measurement protocol are open in the companion repository. Every number cited here traces to a file in `presentation/numbers.md`.*
+*Disk sizes above are file sizes of the test checkpoint and the shipped adapters. They are not phone measurements. Device numbers belong in `presentation/numbers.md`, which is still empty.*

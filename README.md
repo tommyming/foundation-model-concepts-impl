@@ -3,10 +3,14 @@
 Demo app for my article/talk **"On-Device AI Memory Management: Running**  
 **Multi-Task Models Within iOS Resource Limits"**.
 
-One shared frozen base model (`mlx-community/Qwen3-1.7B-4bit`) serves three
-capabilities — summarize, classify, extract — through LoRA adapters that hot-swap
-on the live model. A naive mode loads one full model instance per task for
-comparison. Everything runs on-device from the app bundle, airplane-mode safe.
+One shared frozen base serves three capabilities — summarize, classify, extract —
+through LoRA adapters that swap on the live model. A naive mode loads one full
+model instance per task for comparison. The demo is built to run on-device from
+the app bundle.
+
+The pinned checkpoint, `mlx-community/Qwen3-1.7B-4bit`, is the model this demo
+was tested with. It is not a recommendation. Pick your own base if you are
+shipping a product. This app loads that test checkpoint from the bundle.
 
 ## Build and run
 
