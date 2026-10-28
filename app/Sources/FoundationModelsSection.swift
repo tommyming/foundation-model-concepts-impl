@@ -6,6 +6,7 @@ import SwiftUI
 
 struct FoundationModelsSection: View {
     let input: String
+    var disabled: Bool = false
 
     var body: some View {
         Section("On-device Foundation Models") {
@@ -13,7 +14,7 @@ struct FoundationModelsSection: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             if #available(iOS 26, *) {
-                SystemModelExtractionView(input: input)
+                SystemModelExtractionView(input: input, disabled: disabled)
             } else {
                 Text("Requires iOS 26.")
                     .foregroundStyle(.secondary)
@@ -25,6 +26,7 @@ struct FoundationModelsSection: View {
 @available(iOS 26, *)
 private struct SystemModelExtractionView: View {
     let input: String
+    var disabled: Bool = false
     @State private var status = "—"
     @State private var output = ""
     @State private var running = false
@@ -35,7 +37,7 @@ private struct SystemModelExtractionView: View {
             Button("Extract with System Model") {
                 Task { await extract() }
             }
-            .disabled(running)
+            .disabled(running || disabled)
             if !output.isEmpty {
                 Text(output)
                     .font(.body.monospaced())

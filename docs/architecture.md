@@ -65,7 +65,7 @@ The system-model section is separate. `app/Sources/FoundationModelsSection.swift
 
 1. If `activeAdapter` is already that task, return nil. Do not unload. Do not load. Do not build another session here. `perform()` already replaced it.
 2. Parse `LoRAContainer.from(directory:)` once per task and cache it. The directory is `adapters/<task>` in the bundle. Parse sits outside the timed switch.
-3. Unload the previous adapter before the load. Inside `container.update`, the code calls `old?.unload(from: context.model)` and then `adapter.load(into: context.model)`.
+3. Unload the previous adapter before the load. Inside `container.update`, the code calls `old?.unload(from: context.model)` and then `adapter.load(into: context.model)`. If the load throws, `activeAdapter` is cleared. The name must not stay on an unloaded model.
 4. After a successful switch, `rebuildSession(for:)` builds a new `ChatSession`. The KV cache must not span an adapter boundary.
 5. The code does not call `fuse`, `setLoRAEnabled`, or `perform(with:)`.
 

@@ -374,6 +374,8 @@ final class AppModel: ObservableObject {
         }
         DemoSignposts.end("AdapterSwitch", sp)
         if let error = box.error {
+            // Unload already ran. A stale name would skip the next load.
+            activeAdapter = nil
             throw error
         }
         let elapsed = clock.now - start

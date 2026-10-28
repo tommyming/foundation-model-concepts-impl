@@ -49,7 +49,9 @@ Mac, [documented] from sources, [inferred] reasoning, [pending] to measure.
   app does not call them yet.
 - Whether `enable_thinking: false` keeps reasoning tokens out of the first
   visible output on device. The pinned template reads that flag, not
-  `/no_think`. The app now passes the flag. — [pending]
+  `/no_think`. The app now passes the flag. The shipped adapters were trained
+  without it. Do not claim answer quality matches a thinking-off prompt until
+  they are retrained. — [pending]
 
 ## Surprises so far
 

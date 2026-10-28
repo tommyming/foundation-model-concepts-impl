@@ -118,7 +118,7 @@ struct ContentView: View {
                     }.frame(minHeight: 160)
                 }
 
-                FoundationModelsSection(input: prompt)
+                FoundationModelsSection(input: prompt, disabled: benchRunning || model.isBusy)
 
                 if let err = model.errorText {
                     Section { Text(err).foregroundStyle(.red) }

@@ -60,7 +60,7 @@ Tap that share link. Save the file to the Mac (AirDrop or Files).
 Current keys:
 
 - `environment.device`, `environment.os`, `environment.model`, `environment.adapters`
-- `environment.debuggerAttached` — true when the process is traced (`P_TRACED`). Do not publish a file where this is true.
+- `environment.debuggerAttached` — true when the process is traced (`P_TRACED`). Do not publish a file where this is true. `plot.py` stops on that file. It does not draw the chart.
 - `runs[].scenario`, `runs[].architecture`, `runs[].measuredIteration`
 - `runs[].thermalState` — `ProcessInfo.thermalState.rawValue`, captured at the start of each iteration
 - `steps[].task`

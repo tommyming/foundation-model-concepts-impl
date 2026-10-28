@@ -23,7 +23,7 @@ Legend for sources:
 | 10 | Result: memory over time | Chart A, both architectures overlaid, tasks annotated | P5 JSON × 2 runs (one per mode); plot.py |
 | 11 | Result: latency breakdown | Chart B: adapter switch / TTFT / generation stacked | P5 JSON, shared mode |
 | 12 | Switch cost detail | Median switch ms + "no app restart" claim; adapter state machine mini-diagram | P5 JSON `adapterSwitchMs`, scenario `adapter-thrashing` |
-| 13 | What surprised us | (a) adapter 20 MB not 2 MB (all-linear keys); (b) footprint after reset: allocator cache keeps X MB (Risk B); (c) thinking-mode TTFT trap | Docs: findings.md; measure (b) in Reset scenario |
+| 13 | What surprised us | (a) adapter 20 MB not 2 MB (all-linear keys); (b) footprint after reset: allocator cache keeps X MB (Risk B); (c) thinking-mode TTFT trap. Answers were trained without `enable_thinking=false`. Do not claim they match a thinking-off prompt. | Docs: findings.md; measure (b) in Reset scenario |
 | 14 | When caching pays | Thrashing vs repeated-task numbers; cache break-even in switches/day | P5 JSON scenarios `adapter-thrashing` + `repeated-same-task` |
 | 15 | Rules for apps + close | 3 rules (features request capabilities; one owner for model lifetime; measure footprint not resident); closing line "airplane mode" | Docs: decisions.md, numbers.md |
 

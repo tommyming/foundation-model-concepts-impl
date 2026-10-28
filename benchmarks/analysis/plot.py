@@ -67,6 +67,11 @@ def chart_a(all_runs, out: Path, plt):
     fig.savefig(out / "chart-a-memory.png", dpi=200)
 
 
+def require_detached(env, path):
+    if env.get("debuggerAttached"):
+        raise SystemExit(f"{path} was debugger-attached; refuse to plot")
+
+
 def required_ms(step, key):
     value = step[key]
     if value is None:
@@ -110,6 +115,12 @@ def _selftest():
         assert "refuse to plot 0" in str(error)
     else:
         raise AssertionError("null ttft was accepted")
+    try:
+        require_detached({"debuggerAttached": True}, "x.json")
+    except SystemExit as error:
+        assert "refuse to plot" in str(error)
+    else:
+        raise AssertionError("debugger run was accepted")
     print("selftest ok")
 
 
@@ -134,6 +145,7 @@ def main():
     all_runs = []
     for p in args.json:
         runs, env = load(p)
+        require_detached(env, p)
         all_runs += runs
         print(f"{p}: {len(runs)} recorded runs, device={env['device']}")
     chart_a(all_runs, args.out, plt)
