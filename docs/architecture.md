@@ -33,11 +33,11 @@ Naive mode (`naive`):
 - The first run of a task calls `makeContainer()` and stores that container in `naiveContainers`.
 - The matching `ChatSession` is stored in `naiveSessions`.
 - `residentInstances` records the task.
-- A later run of the same task reuses that session.
+- A later run of the same task reuses that container and builds a new session.
 - `reset()` is the only release. A new task does not unload an old one.
 - `prepareRun` throws `sharedModelStillResident` if the shared container is still set. The picker path resets first, so a normal mode change does not hit that error.
 
-Both loaders call `makeContainer()`. That function reads `Bundle.main` resource `Qwen3-1.7B-4bit` and uses `BundleTokenizerLoader`. There is no hub download at runtime. `scripts/fetch-model.sh` copies the weights into `app/Resources/Qwen3-1.7B-4bit` before the build. That script uses the Hugging Face `main` revision. `docs/environment.md` still has the commit as TBD.
+Both loaders call `makeContainer()`. That function reads `Bundle.main` resource `Qwen3-1.7B-4bit` and uses `BundleTokenizerLoader`. There is no hub download at runtime. `scripts/fetch-model.sh` downloads commit `3b1b1768f8f8cf8351c712464f906e86c2b8269e` into `app/Resources/Qwen3-1.7B-4bit` before the build. The same commit is in `docs/environment.md`.
 
 Task buttons and Run Scenarios stay disabled until the state is `.ready`. See `app/Sources/ContentView.swift`.
 
@@ -63,7 +63,7 @@ The system-model section is separate. `app/Sources/FoundationModelsSection.swift
 
 `activateAdapter(for:)` in `app/Sources/AppModel.swift` is the switch. It runs only in shared mode.
 
-1. If `activeAdapter` is already that task, return nil. Do not unload. Do not load. Do not build a new session.
+1. If `activeAdapter` is already that task, return nil. Do not unload. Do not load. Do not build another session here. `perform()` already replaced it.
 2. Parse `LoRAContainer.from(directory:)` once per task and cache it. The directory is `adapters/<task>` in the bundle. Parse sits outside the timed switch.
 3. Unload the previous adapter before the load. Inside `container.update`, the code calls `old?.unload(from: context.model)` and then `adapter.load(into: context.model)`.
 4. After a successful switch, `rebuildSession(for:)` builds a new `ChatSession`. The KV cache must not span an adapter boundary.
@@ -71,7 +71,7 @@ The system-model section is separate. `app/Sources/FoundationModelsSection.swift
 
 `clearContext()` also builds a new session. It does not unload the adapter and it does not count as a switch.
 
-The session instructions come from `AITask.instructions`. Those strings match `SYSTEMS` in `training/make_dataset.py`. Summarize and extract end with `/no_think`. Classify does not. The app does not pass `enable_thinking=false` into the chat template. Whether `/no_think` suppresses reasoning tokens on device is not measured. See `docs/findings.md`.
+The session instructions come from `AITask.instructions`. Those strings match `SYSTEMS` in `training/make_dataset.py`. Summarize and extract end with `/no_think`. Classify does not. The pinned tokenizer template does not read `/no_think`. `makeSession` passes `enable_thinking: false`, which is the switch that template reads. Whether the model then skips reasoning tokens on device is not measured.
 
 ## Published metric
 
@@ -127,8 +127,7 @@ Do not treat any item below as a known number.
 - Whether `phys_footprint` falls after `reset()`, and how much MLX cache remains.
 - Whether two naive containers share pages for the same weight file.
 - Whether three naive instances stay under the jetsam limit on an 8 GB iPhone.
-- Whether `/no_think` works in the Swift chat template.
-- The pinned Hugging Face commit of `mlx-community/Qwen3-1.7B-4bit`.
+- Whether the model obeys the empty think block on device. The template injects it when `enable_thinking` is false. That is source, not a device result.
 - Latency and footprint for the system-model section. That section does not record them.
 
 On-disk adapter size is not a device measurement. Each shipped `adapters.safetensors` is 19,947,012 bytes (about 20 MB) on disk. See `training/README.md`.

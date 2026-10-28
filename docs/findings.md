@@ -47,9 +47,9 @@ Mac, [documented] from sources, [inferred] reasoning, [pending] to measure.
 - Footprint after Unload/Reset: how much stays in MLX's allocator cache
   (Risk B) — [pending]. `Memory.cacheLimit`/`clearCache()` controls exist;
   app does not call them yet.
-- Whether `/no_think` reliably suppresses reasoning tokens in Swift (training
-  data includes it for summarize/extract; classify's label-only output makes
-  it moot there) — [pending]
+- Whether `enable_thinking: false` keeps reasoning tokens out of the first
+  visible output on device. The pinned template reads that flag, not
+  `/no_think`. The app now passes the flag. — [pending]
 
 ## Surprises so far
 

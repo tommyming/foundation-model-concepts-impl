@@ -10,4 +10,6 @@ fail = text.split("private func fail", 1)[1].split("private func secondsString",
 assert perform.index("rebuildSessions()") < perform.index("prepareRun(")
 assert perform.index('fail("Cancelled")') < perform.index("lastMetrics =")
 assert "lastMetrics = nil" in fail
+session = text.split("private func makeSession", 1)[1].split("private func fail", 1)[0]
+assert '["enable_thinking": false]' in session
 print("measure rules ok")

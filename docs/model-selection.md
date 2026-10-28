@@ -93,7 +93,7 @@ Use `mlx-community/Qwen3-1.7B-4bit` because the demo needs a reliable on-device 
 1. The weight file is 0.97 GB and the license is Apache-2.0. Both facts are in the research note. Device speed is not measured on device yet.
 2. Swift has a named preset and `model_type` `qwen3`. Python mlx-lm has a Qwen3 trainer. QLoRA against the same 4-bit repo is the training path this repo uses.
 3. The app already loads this id from the bundle and already ships three adapters for it.
-4. Qwen3 thinking mode is on by default in the model card. A live demo needs it off, or time to first token includes the thinking tokens. The app appends `/no_think` on summarize and extract. It does not pass `enable_thinking=false`. Whether that string works on device is not measured.
+4. Qwen3 thinking mode is on unless the chat template gets `enable_thinking=false`. The pinned `tokenizer_config.json` injects an empty think block only when that flag is false. It does not read `/no_think`. The app passes the flag. Whether the model skips reasoning tokens on device is not measured.
 
 Alternates, in the order from the research note, if a later device run rejects this id:
 

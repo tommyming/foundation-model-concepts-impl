@@ -396,7 +396,9 @@ final class AppModel: ObservableObject {
         ChatSession(
             modelContainer,
             instructions: instructions,
-            generateParameters: Self.genParams)
+            generateParameters: Self.genParams,
+            // Pinned Qwen3 template reads this flag. It does not read /no_think.
+            additionalContext: ["enable_thinking": false])
     }
 
     private func fail(_ message: String) {

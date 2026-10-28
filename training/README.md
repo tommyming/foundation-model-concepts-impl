@@ -69,7 +69,7 @@ The `model` value is the 4-bit repo the app ships. That choice makes the run QLo
 
 `training/adapters/` is gitignored. mlx-lm also writes checkpoint files such as `0000100_adapters.safetensors`. Those files are not the app payload.
 
-The base commit is not pinned. `scripts/fetch-model.sh` downloads Hugging Face `main`. `docs/environment.md` still has the commit as TBD. Record the commit before you compare two training runs.
+The app download is pinned to commit `3b1b1768f8f8cf8351c712464f906e86c2b8269e` in `scripts/fetch-model.sh` and `docs/environment.md`. The shipped `adapter_config.json` records the repo id, not that commit. Do not treat a later `main` training run as the same bytes.
 
 This README does not pin an mlx-lm version. `docs/findings.md` records that an older mlx build still wrote the MLX-native pair the app reads.
 
