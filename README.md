@@ -1,7 +1,7 @@
 # AI Memory Lab — On-Device AI Memory Management Demo
 
-Demo app for the iOSConf SG 2027 talk **"On-Device AI Memory Management: Running
-Multi-Task Models Within iOS Resource Limits"**.
+Demo app for my article/talk **"On-Device AI Memory Management: Running**  
+**Multi-Task Models Within iOS Resource Limits"**.
 
 One shared frozen base model (`mlx-community/Qwen3-1.7B-4bit`) serves three
 capabilities — summarize, classify, extract — through LoRA adapters that hot-swap
